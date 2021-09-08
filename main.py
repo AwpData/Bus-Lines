@@ -27,10 +27,24 @@ for data in buses:
 
 total_errors = bus_id + stop_id + stop_name + next_stop + stop_type + a_time
 
-print(f"Errors in validation: {total_errors} errors")
-if bus_id > 0: print(f"bus_id: {bus_id}")
-if stop_id > 0: print(f"stop_id: {stop_id}")
-if stop_name > 0: print(f"stop_name: {stop_name}")
-if next_stop > 0: print(f"next_stop: {next_stop}")
-if stop_type > 0: print(f"stop_type: {stop_type}")
-if a_time > 0: print(f"a_time: {a_time}")
+# Prints if there are any errors
+if total_errors > 0:
+    print(f"Errors in validation: {total_errors} errors")
+    if bus_id > 0: print(f"bus_id: {bus_id}")
+    if stop_id > 0: print(f"stop_id: {stop_id}")
+    if stop_name > 0: print(f"stop_name: {stop_name}")
+    if next_stop > 0: print(f"next_stop: {next_stop}")
+    if stop_type > 0: print(f"stop_type: {stop_type}")
+    if a_time > 0: print(f"a_time: {a_time}")
+    print("\nPlease correct the error(s) and restart the program")
+    exit(-1)
+
+#  Check number of stops
+dict_ = dict()
+for data in buses:
+    dict_.setdefault(data["bus_id"], 0)
+    dict_[data["bus_id"]] += 1
+
+print("Line names and number of stops")
+for key, value in dict_.items():
+    print("bus_id: {}, stops: {}".format(key, value))
