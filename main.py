@@ -38,13 +38,66 @@ if total_errors > 0:
     if a_time > 0: print(f"a_time: {a_time}")
     print("\nPlease correct the error(s) and restart the program")
     exit(-1)
+else:
+    print("All bus data is correctly formatted!")
 
 #  Check number of stops
-dict_ = dict()
-for data in buses:
-    dict_.setdefault(data["bus_id"], 0)
-    dict_[data["bus_id"]] += 1
+stop_dict = dict()
+street_dict = dict()
+time_dict = dict()
+on_demand_dict = dict()
+starts = set()
+finishes = set()
+transfers = set()
 
-print("Line names and number of stops")
-for key, value in dict_.items():
-    print("bus_id: {}, stops: {}".format(key, value))
+for data in buses:
+    stop_dict.setdefault(data["bus_id"], []).append(data["stop_type"])
+    street_dict.setdefault(data["bus_id"], []).append(data["stop_name"])
+    time_dict.setdefault(data["bus_id"], []).append([data["a_time"], data["stop_name"]])
+
+    if data["stop_type"] == "O":
+        on_demand_dict.setdefault(data["bus_id"], []).append([data["stop_type"], data["stop_name"]])
+    if data["stop_type"] == "S":
+        starts.add(data["stop_name"])
+    elif data["stop_type"] == "F":
+        finishes.add(data["stop_name"])
+
+# Check that there is exactly one stop or finish for each line
+for data in stop_dict:
+    if stop_dict[data].count("S") != 1 or stop_dict[data].count("F") != 1:
+        print("ERROR: There is no start or end stop for the line: {}.".format(data))
+        break
+
+# List each unique start, transfer, and stop
+else:
+    for i in range(0, len(street_dict.values()) - 1):
+        for j in range(i + 1, len(street_dict.values())):
+            transfers.update(set.intersection(set(list(street_dict.values())[i]), set(list(street_dict.values())[j])))
+
+    print("\nStart stops: {} {}".format(len(starts), sorted(starts)))
+    print("Transfer stops: {} {}".format(len(transfers), sorted(transfers)))
+    print("Finish stops: {} {}\n".format(len(finishes), sorted(finishes)))
+
+    # Check for 'O' stops not being start, transfer, or finish stops
+    incorrect = False
+    bad_stops = []
+    for data in on_demand_dict:
+        for i in range(0, len(on_demand_dict[data])):
+            if on_demand_dict[data][i][1] in [*starts, *transfers, *finishes]:
+                bad_stops.append(on_demand_dict[data][i][1])
+                incorrect = True
+    if not incorrect:
+        print("All 'O' stops are not start, transferring, or finishing stops!")
+    else:
+        print("WARNING: Wrong 'O' stop type: {}".format(sorted(bad_stops)))
+
+    # Check for increasing times on each bus line
+    incorrect = False
+    for data in time_dict:
+        for i in range(0, len(time_dict[data]) - 1):
+            if time_dict[data][i + 1][0] <= time_dict[data][i][0]:
+                print("WARNING: This time is not correct at {}: {}".format(data, time_dict[data][i + 1][1]))
+                incorrect = True
+                break
+    if not incorrect:
+        print("All times are increasing for each bus line!")

@@ -12,7 +12,7 @@
         "stop_id": 3,
         "stop_name": "Elm Street",
         "next_stop": 5,
-        "stop_type": "",
+        "stop_type": "O",
         "a_time": "08:19"
     },
     {
@@ -52,7 +52,7 @@
         "stop_id": 6,
         "stop_name": "Sunset Boulevard",
         "next_stop": 7,
-        "stop_type": "",
+        "stop_type": "O",
         "a_time": "09:59"
     },
     {
